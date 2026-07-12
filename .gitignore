@@ -1,0 +1,63 @@
+# .NET
+/bin/
+/obj/
+/packages/
+*.user
+*.suo
+*.cache
+*.pidb
+*.log
+*.tmp
+*.tmp_proj
+_ReSharper.*/
+*.sln.ide/
+*.sln.docstates
+*.pidb.meta
+*.pdb
+*.mdb
+*.pyc
+*.pyo
+*.pyd
+*.pycache/
+*.coverage
+*.coverage.xml
+*.coverage.xml
+*.coverage
+*.trx
+*.TestResults
+*.ncrunch*
+*.ncrunch
+*.ncrunchproject
+*.dotCover
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+/artifacts/
+/publish/
+/output/
+/dist/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+EOF
