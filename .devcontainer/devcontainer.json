@@ -1,0 +1,45 @@
+{
+  "name": "Barakah Platform",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "9.0"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": true
+    }
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "16gb"
+  },
+  "forwardPorts": [3000, 5001, 5003, 5004, 5005, 5006, 5007, 5011, 5012, 5432, 6379, 9092],
+  "portsAttributes": {
+    "3000": { "label": "Admin Dashboard", "visibility": "public", "onAutoForward": "openPreview" },
+    "5001": { "label": "Identity Service", "visibility": "public" },
+    "5003": { "label": "Tenant Service", "visibility": "public" },
+    "5004": { "label": "Catalog Service", "visibility": "public" },
+    "5005": { "label": "Inventory Service", "visibility": "public" },
+    "5006": { "label": "Order Service", "visibility": "public" },
+    "5007": { "label": "Payment Service", "visibility": "public" },
+    "5011": { "label": "Notification Service", "visibility": "public" },
+    "5012": { "label": "Analytics Service", "visibility": "public" },
+    "5432": { "label": "Postgres (Citus)", "visibility": "private" },
+    "6379": { "label": "Redis", "visibility": "private" },
+    "9092": { "label": "Kafka", "visibility": "private" }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postStartCommand": "bash .devcontainer/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-azuretools.vscode-docker",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

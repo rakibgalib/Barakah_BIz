@@ -1,7 +1,7 @@
 # .NET
-/bin/
-/obj/
-/packages/
+bin/
+obj/
+packages/
 *.user
 *.suo
 *.cache
@@ -60,4 +60,10 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-EOF
+.next/
+
+# Claude Code local tool state (personal, not shared project config)
+.claude/
+
+# graphify output — regenerable, not checked in (see docs/PROGRESS.md)
+graphify-out/

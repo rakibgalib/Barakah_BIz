@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barakah Platform · Implementation Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.12);
+            padding: 2.5rem 2.8rem;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9edf2;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .logo-icon {
+            background: #0f2b3d;
+            color: #f3d37c;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .logo-text {
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .logo-text span { color: #b8860b; }
+        .badge {
+            background: #eef2f6;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .badge i { color: #b8860b; margin-right: 6px; }
+        .meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            background: #f8fafc;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .meta-info i { color: #b8860b; margin-right: 6px; }
+        .toc {
+            background: #f1f4f8;
+            padding: 1.2rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.8rem;
+            align-items: center;
+        }
+        .toc-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+            color: #0f2b3d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: 0.15s;
+            border-bottom: 1px solid transparent;
+        }
+        .toc a:hover { color: #b8860b; border-bottom-color: #b8860b; }
+        h1, h2, h3 { font-weight: 700; letter-spacing: -0.01em; }
+        h1 { font-size: 2.4rem; margin-bottom: 0.5rem; }
+        h2 {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1.2rem 0;
+            padding-bottom: 0.4rem;
+            border-bottom: 3px solid #f3d37c;
+            display: inline-block;
+        }
+        h3 {
+            font-size: 1.3rem;
+            margin: 1.8rem 0 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 i { color: #b8860b; font-size: 1.4rem; width: 2rem; }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.2rem 0;
+        }
+        .stat-card {
+            background: #f9fafc;
+            border-radius: 20px;
+            padding: 1.5rem 1.2rem;
+            border: 1px solid #eef2f6;
+            transition: 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05);
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f2b3d;
+            margin-top: 0.2rem;
+        }
+        .stat-card .desc {
+            font-size: 0.9rem;
+            color: #475569;
+            margin-top: 0.5rem;
+        }
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fafbfc;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 1.2rem 0;
+            font-size: 0.9rem;
+        }
+        .feature-table th {
+            background: #0f2b3d;
+            color: white;
+            font-weight: 600;
+            padding: 0.8rem 1rem;
+            text-align: left;
+        }
+        .feature-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e9edf2;
+        }
+        .feature-table tr:last-child td { border-bottom: none; }
+        .ai-badge {
+            background: #f3d37c20;
+            color: #7a5d0e;
+            font-weight: 600;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            border: 1px solid #f3d37c50;
+            display: inline-block;
+            margin: 0.15rem 0;
+        }
+        .code-block {
+            background: #0f1a24;
+            color: #e2e8f0;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            font-family: 'Menlo', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            margin: 0.8rem 0;
+            white-space: pre-wrap;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+        }
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin: 1.2rem 0;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: baseline;
+            gap: 1.2rem;
+            border-left: 3px solid #f3d37c;
+            padding-left: 1.2rem;
+        }
+        .timeline-item .phase {
+            font-weight: 700;
+            color: #0f2b3d;
+            min-width: 100px;
+        }
+        .pill {
+            background: #eef2f6;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .flex { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .mt-2 { margin-top: 1.2rem; }
+        .mb-1 { margin-bottom: 0.6rem; }
+        hr {
+            border: none;
+            border-top: 1px solid #e9edf2;
+            margin: 2rem 0;
+        }
+        .icon-list i { color: #b8860b; width: 1.6rem; }
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.8rem;
+        }
+        .checklist-item {
+            background: #fafbfc;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            border-left: 4px solid #f3d37c;
+            font-size: 0.9rem;
+        }
+        .checklist-item .status {
+            float: right;
+            color: #94a3b8;
+        }
+        .mermaid-wrapper {
+            background: #fafbfc;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.2rem 0;
+            border: 1px solid #e9edf2;
+            overflow-x: auto;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1.5rem; }
+            .grid-2col { grid-template-columns: 1fr; }
+            .meta-info { border-radius: 20px; }
+            .header { flex-direction: column; align-items: start; gap: 1rem; }
+            .toc { flex-direction: column; align-items: start; }
+        }
+        .note-info {
+            background: #eef2f6;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border-left: 6px solid #b8860b;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon">B</div>
+            <div class="logo-text">Barakah <span>Platform</span></div>
+            <span class="badge"><i class="fas fa-star"></i> v2.0 · Complete Guide</span>
+        </div>
+        <div class="meta-info">
+            <span><i class="fas fa-calendar-alt"></i> August 2026</span>
+            <span><i class="fas fa-file-alt"></i> 16 Chapters</span>
+            <span><i class="fas fa-users"></i> 12-15 Team</span>
+        </div>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+        <span class="toc-title"><i class="fas fa-list-ul"></i> CONTENTS</span>
+        <a href="#executive">Executive</a>
+        <a href="#precheck">Pre-Checklist</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#structure">Project Structure</a>
+        <a href="#core-services">Core Services</a>
+        <a href="#ai-stack">AI Stack</a>
+        <a href="#database">Database</a>
+        <a href="#deployment">Deployment</a>
+        <a href="#extensions">Extensions</a>
+        <a href="#security">Security</a>
+        <a href="#monitoring">Monitoring</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#team">Team</a>
+        <a href="#golive">Go-Live</a>
+        <a href="#metrics">Metrics</a>
+        <a href="#budget">Budget</a>
+    </div>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <h2 id="executive"><i class="fas fa-bullseye"></i> Executive Summary</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
+        <div style="background: #f3d37c10; padding: 0.5rem 1.2rem; border-radius: 40px; border:1px solid #f3d37c30;"><i class="fas fa-rocket"></i> AI-powered multi-tenant SaaS</div>
+        <div style="background: #eef2f6; padding: 0.5rem 1.2rem; border-radius: 40px;"><i class="fas fa-store"></i> Unifies pharmacies, clothing, restaurants, supermarkets</div>
+    </div>
+    <p><strong>Vision:</strong> "Blessing in Every Transaction" — a comprehensive multi-tenant AI-powered SaaS platform that unifies business management across multiple industries.</p>
+    <p><strong>Mission:</strong> To bring abundance to businesses through unified, intelligent management solutions powered by artificial intelligence, enabling businesses to thrive in the digital economy.</p>
+
+    <h3>Core Value Proposition</h3>
+    <table class="feature-table">
+        <tr><th>Feature</th><th>Benefit</th><th>Business Impact</th></tr>
+        <tr><td>Unified Platform</td><td>Single solution for multiple business types</td><td>Reduced complexity</td></tr>
+        <tr><td>AI-Powered</td><td>Intelligent insights and automation</td><td>Better decisions</td></tr>
+        <tr><td>Multi-Tenant</td><td>Scale from single store to enterprise chains</td><td>Flexible growth</td></tr>
+        <tr><td>Modular</td><td>Pay-as-you-grow with business-specific extensions</td><td>Cost-effective</td></tr>
+    </table>
+
+    <h3>Business Impact Metrics</h3>
+    <div class="card-grid">
+        <div class="stat-card"><div class="label">Revenue Growth</div><div class="value">+25-40%</div><div class="desc">AI-driven recommendations</div></div>
+        <div class="stat-card"><div class="label">Operational Efficiency</div><div class="value">-30%</div><div class="desc">reduction in manual tasks</div></div>
+        <div class="stat-card"><div class="label">Customer Satisfaction</div><div class="value">+35%</div><div class="desc">through personalization</div></div>
+        <div class="stat-card"><div class="label">Inventory Optimization</div><div class="value">-20%</div><div class="desc">waste reduction</div></div>
+        <div class="stat-card"><div class="label">Fraud Prevention</div><div class="value">-45%</div><div class="desc">fraudulent transactions</div></div>
+        <div class="stat-card"><div class="label">Time-to-Market</div><div class="value">60% faster</div><div class="desc">new feature deployment</div></div>
+    </div>
+
+    <!-- 2. PRE-IMPLEMENTATION CHECKLIST -->
+    <h2 id="precheck"><i class="fas fa-check-double"></i> Pre-Implementation Checklist</h2>
+    <h3>Infrastructure Prerequisites</h3>
+    <div class="checklist-grid">
+        <div class="checklist-item"><i class="fas fa-check-circle" style="color:#2d7a3a;"></i> Project Name: Barakah <span class="status">Registered</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Domain Registration (barakah.com / .io) <span class="status">High</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Dev Environment: VS 2022 / VS Code <span class="status">High</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> .NET 9 SDK <span class="status">High</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Docker Desktop with Kubernetes <span class="status">High</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> PostgreSQL 16 with Citus <span class="status">High</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Git & GitHub <span class="status">High</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Cloud Account (Azure/AWS/GCP) <span class="status">Medium</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> AI Services: Gemini / DeepSeek / Claude APIs <span class="status">Medium</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Stripe Account <span class="status">Medium</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> SMTP Service <span class="status">Medium</span></div>
+        <div class="checklist-item"><i class="far fa-circle"></i> Monitoring Tools (App Insights / DataDog) <span class="status">Low</span></div>
+    </div>
+
+    <h3>Technology Stack</h3>
+    <div class="code-block">
+Backend:
+  - .NET 9.0
+  - PostgreSQL 16 (Citus Extension)
+  - Redis 7.0
+  - Apache Kafka
+  - ElasticSearch 8.x
+
+Frontend:
+  - React 18 / Next.js 14 (Admin)
+  - React Native (Mobile)
+  - PWA (POS System)
+
+AI/ML (Third-Party Services):
+  - Gemini API (Google) - NLP & Reasoning
+  - DeepSeek API - Code Generation & Analysis
+  - Claude API (Anthropic) - Conversational AI
+  - Pinecone - Vector Database for RAG
+  - LangChain - AI Orchestration
+  - Hugging Face - Open Source Models
+
+DevOps:
+  - Kubernetes
+  - Docker
+  - GitHub Actions
+  - Terraform
+  - Prometheus/Grafana
+    </div>
+
+    <!-- 3. SYSTEM ARCHITECTURE (Mermaid) -->
+    <h2 id="architecture"><i class="fas fa-sitemap"></i> System Architecture</h2>
+    <div class="mermaid-wrapper">
+        <div class="mermaid">
+            graph TB
+                subgraph API_Gateway[API Gateway]
+                    Gateway[Ocelot Gateway :5000]
+                end
+
+                subgraph Services[Microservices]
+                    Identity[Identity Service :5001]
+                    Tenant[Tenant Service :5003]
+                    Catalog[Catalog Service :5004]
+                    Inventory[Inventory Service :5005]
+                    Order[Order Service :5006]
+                    Payment[Payment Service :5007]
+                    Notification[Notification Service :5011]
+                    Analytics[Analytics Service :5012]
+                    AIService[AI Service :5009]
+                end
+
+                subgraph Extensions[Business Extensions]
+                    Pharmacy[Pharmacy Extension :5008]
+                    Clothing[Clothing Extension :5013]
+                    Restaurant[Restaurant Extension :5010]
+                    SuperShop[SuperShop Extension :5014]
+                end
+
+                subgraph DataLayer[Data Layer]
+                    PG[(PostgreSQL :5432)]
+                    Redis[(Redis Cache :6379)]
+                    ES[(ElasticSearch :9200)]
+                    Kafka[Kafka Broker :9092]
+                end
+
+                Gateway --> Identity
+                Gateway --> Tenant
+                Gateway --> Catalog
+                Gateway --> Inventory
+                Gateway --> Order
+                Gateway --> Payment
+                Gateway --> Notification
+                Gateway --> Analytics
+                Gateway --> AIService
+                Gateway --> Pharmacy
+                Gateway --> Clothing
+                Gateway --> Restaurant
+                Gateway --> SuperShop
+
+                Identity --> PG
+                Tenant --> PG
+                Catalog --> PG
+                Inventory --> PG
+                Order --> PG
+                Payment --> PG
+                Notification --> PG
+                Analytics --> PG
+                Pharmacy --> PG
+                Clothing --> PG
+                Restaurant --> PG
+                SuperShop --> PG
+
+                Catalog --> Redis
+                Inventory --> Redis
+                Order --> Redis
+
+                Catalog --> ES
+                Order --> ES
+                Payment --> ES
+                Analytics --> ES
+
+                Identity -.-> Kafka
+                Catalog -.-> Kafka
+                Inventory -.-> Kafka
+                Order -.-> Kafka
+                Payment -.-> Kafka
+                Notification -.-> Kafka
+                Analytics -.-> Kafka
+                AIService -.-> Kafka
+                Pharmacy -.-> Kafka
+                Clothing -.-> Kafka
+                Restaurant -.-> Kafka
+                SuperShop -.-> Kafka
+
+                classDef gateway fill:#f3d37c40,stroke:#b8860b,stroke-width:2px;
+                classDef service fill:#dbeafe,stroke:#2563eb,stroke-width:1px;
+                classDef data fill:#e5e7eb,stroke:#4b5563,stroke-width:1px;
+                class Gateway gateway;
+                class Identity,Tenant,Catalog,Inventory,Order,Payment,Notification,Analytics,AIService,Pharmacy,Clothing,Restaurant,SuperShop service;
+                class PG,Redis,ES,Kafka data;
+        </div>
+    </div>
+    <p><strong>Communication:</strong> Synchronous (REST) for real-time operations; asynchronous events via Kafka for decoupled workflows (e.g., order confirmation → inventory update → notification).</p>
+    <p><strong>API Gateway Responsibilities:</strong> Authentication, rate limiting, request/response transformation, circuit breaking, load balancing, logging, caching.</p>
+
+    <!-- 4. PROJECT STRUCTURE -->
+    <h2 id="structure"><i class="fas fa-folder-open"></i> Project Structure</h2>
+    <div class="code-block">
+F:\Personal\Barakah_BIz/
+│
+├── 📁 src/
+│   ├── 📁 Shared/                    # Shared Libraries
+│   │   ├── Barakah.SharedKernel/     # Core domain, DDD building blocks
+│   │   ├── Barakah.EventBus/         # Event-driven communication
+│   │   ├── Barakah.Persistence/      # Database abstractions
+│   │   ├── Barakah.TenantContext/    # Multi-tenant management
+│   │   └── Barakah.AI.Core/          # AI/ML core services
+│   │
+│   ├── 📁 Modules/                   # Microservices
+│   │   ├── IdentityService/          # Auth & User Management
+│   │   ├── TenantService/            # Tenant Management
+│   │   ├── CatalogService/           # Product Catalog
+│   │   ├── InventoryService/         # Stock Management
+│   │   ├── OrderService/             # Order Processing
+│   │   ├── PaymentService/           # Payment Processing
+│   │   ├── NotificationService/      # Notifications (Email/SMS)
+│   │   ├── AnalyticsService/         # Business Intelligence
+│   │   └── AIService/                # AI Microservice
+│   │
+│   ├── 📁 Extensions/                # Business-Specific Extensions
+│   │   ├── PharmacyExtension/
+│   │   ├── ClothingExtension/
+│   │   ├── RestaurantExtension/
+│   │   └── SuperShopExtension/
+│   │
+│   └── 📁 Web/                       # Frontend Applications
+│       ├── Barakah.Admin/            # Admin Dashboard (React/Next.js)
+│       ├── Barakah.Portal/           # Business Portal
+│       ├── Barakah.POS/              # Point of Sale (PWA)
+│       └── Barakah.Mobile/           # Mobile App (React Native)
+│
+├── 📁 tests/                         # Unit, Integration, E2E, Load tests
+├── 📁 deployments/                   # Kubernetes, Helm, Terraform
+├── 📁 docs/                          # API, Architecture, Deployment, User guides
+├── 📁 scripts/                       # Automation scripts
+├── 📁 brand/                         # Branding assets
+├── 📁 .github/workflows/             # CI/CD pipelines
+├── docker-compose.yml
+├── Dockerfile
+├── .env.example
+├── README.md
+└── BarakahPlatform.sln
+    </div>
+
+    <!-- 5. CORE SERVICES OVERVIEW -->
+    <h2 id="core-services"><i class="fas fa-cogs"></i> Core Services Overview</h2>
+    <h3>Identity Service</h3>
+    <ul>
+        <li><strong>Authentication:</strong> Email/Password, Social Login (OAuth 2.0), Biometric (Mobile), 2FA (TOTP/SMS), SSO (SAML/OIDC)</li>
+        <li><strong>Authorization:</strong> RBAC (Roles/Permissions), ABAC (Attribute-Based), Tenant Isolation, Fine-Grained Access Control</li>
+        <li><strong>Security:</strong> JWT with Refresh Tokens, Password Hashing (bcrypt), Rate Limiting, Brute Force Protection</li>
+        <li>Audit Logging, AI-Powered Anomaly Detection, Risk Scoring</li>
+    </ul>
+
+    <h3>Tenant Service</h3>
+    <ul>
+        <li>Multi-Tenant Management: Create and manage tenants</li>
+        <li>Subscription Management: Tier-based plans (Basic, Professional, Enterprise, Pharmacy, Restaurant, Clothing, SuperShop — pricing TBD)</li>
+        <li>Customization: Per-tenant branding and settings, resource isolation (dedicated schemas), feature flags, usage analytics</li>
+    </ul>
+
+    <h3>Catalog Service</h3>
+    <ul>
+        <li>Product Management (CRUD), Category Management (hierarchical), Inventory Tracking, Full-text search with relevance, Bulk Import/Export, Version Control, Multi-Format Support</li>
+    </ul>
+
+    <h3>Order Service</h3>
+    <ul>
+        <li>Order Processing (create, update, track), Inventory Integration (auto stock deduction), Payment Integration, Order Status Tracking, Return Management, Analytics</li>
+    </ul>
+
+    <h3>Inventory Service</h3>
+    <ul>
+        <li>Real-Time Stock Tracking (multi-location), Low-Stock Alerts, Automatic Reordering Rules, Stock Reservations (checkout holds), Warehouse/Branch Transfers, Batch & Expiry Tracking</li>
+    </ul>
+
+    <h3>Payment Service</h3>
+    <ul>
+        <li>Payment Processing (Stripe integration), Multiple Payment Methods (card, mobile wallet, cash), Refunds & Partial Refunds, Payment Reconciliation, Fraud Detection Hooks, PCI-DSS Scoped Handling</li>
+    </ul>
+
+    <h3>Notification Service</h3>
+    <ul>
+        <li>Multi-Channel Delivery (Email, SMS, Push), Templated Messages, Event-Driven Triggers (via Kafka), Delivery Status Tracking, User Notification Preferences</li>
+    </ul>
+
+    <h3>Analytics Service</h3>
+    <ul>
+        <li>Business Intelligence Dashboards, Sales & Revenue Reporting, Customer Behavior Analytics, Cross-Tenant Aggregation (anonymized), Data Export (CSV/PDF)</li>
+    </ul>
+
+    <h3>AI Service</h3>
+    <ul>
+        <li>Central orchestration layer for Gemini/DeepSeek/Claude integrations — see the <a href="#ai-stack">AI Technology Stack</a> section for details. Scheduled for the AI Integration phase of the roadmap (Month 7-8).</li>
+    </ul>
+
+    <!-- 6. AI TECHNOLOGY STACK (Features are skipped, only stack) -->
+    <h2 id="ai-stack"><i class="fas fa-microchip"></i> AI Technology Stack</h2>
+    <div class="note-info">
+        <i class="fas fa-clock" style="color:#b8860b; margin-right:8px;"></i>
+        <strong>AI features (recommendations, forecasting, chatbots, etc.) will be implemented in the final phase of the project.</strong> The underlying technology stack is defined below.
+    </div>
+    <div class="card-grid">
+        <div class="stat-card"><span class="label">Gemini (Google)</span><div class="value">NLP & Reasoning</div><div class="desc">Multi-modal, text/image/audio</div></div>
+        <div class="stat-card"><span class="label">DeepSeek</span><div class="value">Code & Analysis</div><div class="desc">High-performance, cost-effective</div></div>
+        <div class="stat-card"><span class="label">Claude (Anthropic)</span><div class="value">Conversational AI</div><div class="desc">Safe, helpful, ethical</div></div>
+        <div class="stat-card"><span class="label">Pinecone + LangChain</span><div class="value">Vector DB & Orchestration</div><div class="desc">RAG, embeddings</div></div>
+    </div>
+    <div class="code-block">
+# AI Service configuration (YAML)
+AIServices:
+  Gemini:
+    Endpoint: https://generativelanguage.googleapis.com/v1beta
+    Model: gemini-1.5-pro
+    UseCases: [NLP, multi-modal reasoning]
+  DeepSeek:
+    Endpoint: https://api.deepseek.com/v1
+    Model: deepseek-coder
+    UseCases: [Code generation, data analysis]
+  Claude:
+    Endpoint: https://api.anthropic.com/v1
+    Model: claude-3-opus
+    UseCases: [Conversational AI, safe interactions]
+    </div>
+    <h3>Prompt Engineering Strategy (Example)</h3>
+    <div class="code-block">
+# Placeholder templates – will be refined during AI implementation phase
+SalesForecasting: "Analyze the following sales data and predict next month's sales: [DATA] ..."
+ProductRecommendation: "Based on this customer's purchase history: [HISTORY] ..."
+DrugInteraction: "Check for interactions between these medications: [MEDICATIONS] ..."
+    </div>
+    <h3>RAG Implementation</h3>
+    <ul>
+        <li>Vector Database: Pinecone</li>
+        <li>Use Cases: Product Knowledge Base, Medical Information, Business Documentation</li>
+        <li>Process: Embed documents → Store in Pinecone → Query similar content → Augment LLM prompt</li>
+    </ul>
+    <h3>Cost Optimization</h3>
+    <ul>
+        <li>Caching (Redis), Batching requests, Tiered models (smaller for simple tasks), Fallbacks (local models), Monitor token usage and costs</li>
+    </ul>
+
+    <!-- 7. DATABASE DESIGN OVERVIEW -->
+    <h2 id="database"><i class="fas fa-database"></i> Database Design Overview</h2>
+    <div class="note-info">
+        <i class="fas fa-info-circle" style="color:#b8860b; margin-right:8px;"></i>
+        <strong>Assumption:</strong> Citus is adopted from day one for future scale. If early tenant volume doesn't require sharding, a single PostgreSQL instance with the same schema strategy can defer this cost until it's actually needed.
+    </div>
+    <h3>Citus Distributed Database</h3>
+    <ul>
+        <li>Primary Node: metadata and coordination</li>
+        <li>Worker Nodes: distributed data storage</li>
+        <li>Shared Tables: Tenant, User, Role (Replicated)</li>
+        <li>Distributed Tables: Products, Orders, Inventory</li>
+    </ul>
+    <h3>Schema Strategy</h3>
+    <ul>
+        <li><strong>Public Schema:</strong> Tenants, Users, Roles, Permissions</li>
+        <li><strong>Tenant Schema (Dynamic):</strong> tenant_{tenant_id} with Products, Categories, Orders, Inventory, Customers, Employees</li>
+    </ul>
+    <table class="feature-table">
+        <tr><th>Table</th><th>Purpose</th><th>Distribution</th></tr>
+        <tr><td>Tenants</td><td>Business tenants</td><td>Reference</td></tr>
+        <tr><td>Users</td><td>System users</td><td>Reference</td></tr>
+        <tr><td>Products</td><td>Product catalog</td><td>Distributed</td></tr>
+        <tr><td>Orders</td><td>Order management</td><td>Distributed</td></tr>
+        <tr><td>Inventory</td><td>Stock levels</td><td>Distributed</td></tr>
+        <tr><td>Customers</td><td>Customer data</td><td>Distributed</td></tr>
+    </table>
+    <h3>Index Strategy</h3>
+    <ul>
+        <li>B-tree: Primary keys, foreign keys (all tables)</li>
+        <li>GIN: Full-text search (Products, Orders)</li>
+        <li>JSONB: Dynamic attributes (Products, Customers)</li>
+        <li>Spatial: Location-based (Branches)</li>
+    </ul>
+
+    <!-- 8. DEPLOYMENT STRATEGY -->
+    <h2 id="deployment"><i class="fas fa-cloud-upload-alt"></i> Deployment Strategy</h2>
+    <h3>Environments</h3>
+    <ul>
+        <li><strong>Development:</strong> Local, Docker Compose, Local settings</li>
+        <li><strong>Staging:</strong> Kubernetes (Dev cluster), Staging settings, Testing/QA</li>
+        <li><strong>Production:</strong> Kubernetes (Prod cluster), Production settings, Live operations</li>
+    </ul>
+    <h3>Container Strategy (Docker Compose)</h3>
+    <table class="feature-table">
+        <tr><th>Service</th><th>Purpose</th><th>Port</th></tr>
+        <tr><td>PostgreSQL</td><td>Database</td><td>5432</td></tr>
+        <tr><td>Redis</td><td>Cache</td><td>6379</td></tr>
+        <tr><td>Kafka</td><td>Message Bus</td><td>9092</td></tr>
+        <tr><td>Gateway</td><td>Ocelot API Gateway</td><td>5000</td></tr>
+        <tr><td>Identity</td><td>Auth Service</td><td>5001</td></tr>
+        <tr><td>Tenant</td><td>Tenant Service</td><td>5003</td></tr>
+        <tr><td>Catalog</td><td>Product Service</td><td>5004</td></tr>
+        <tr><td>Inventory</td><td>Stock Service</td><td>5005</td></tr>
+        <tr><td>Order</td><td>Order Service</td><td>5006</td></tr>
+        <tr><td>Payment</td><td>Payment Service</td><td>5007</td></tr>
+        <tr><td>Pharmacy</td><td>Pharmacy Extension</td><td>5008</td></tr>
+        <tr><td>AI</td><td>AI Service</td><td>5009</td></tr>
+        <tr><td>Restaurant</td><td>Restaurant Extension</td><td>5010</td></tr>
+        <tr><td>Notification</td><td>Notification Service</td><td>5011</td></tr>
+        <tr><td>Analytics</td><td>Analytics Service</td><td>5012</td></tr>
+        <tr><td>Clothing</td><td>Clothing Extension</td><td>5013</td></tr>
+        <tr><td>SuperShop</td><td>SuperShop Extension</td><td>5014</td></tr>
+    </table>
+    <h3>Kubernetes Strategy</h3>
+    <ul>
+        <li>Deployments (workloads), Services (discovery), Ingress (external access), ConfigMaps & Secrets (configuration), PVC (persistent storage)</li>
+    </ul>
+    <h3>Deployment Pipeline</h3>
+    <div class="code-block">
+Build (GitHub Actions) → Test (Unit + Integration) → Deploy (Staging) → Monitor (Prometheus + Grafana) → Deploy Prod (Canary)
+    </div>
+    <h3>Scaling</h3>
+    <ul>
+        <li><strong>Horizontal:</strong> Stateless services scale horizontally; auto-scaling based on CPU/Memory</li>
+        <li><strong>Vertical:</strong> Database and cache resources increase; AI services parallel processing</li>
+    </ul>
+
+    <!-- 9. BUSINESS EXTENSIONS -->
+    <h2 id="extensions"><i class="fas fa-store-alt"></i> Business Extensions</h2>
+    <div class="grid-2col">
+        <div>
+            <h3><i class="fas fa-hospital-alt" style="color:#b8860b;"></i> Pharmacy Extension</h3>
+            <ul>
+                <li>Drug Interaction Checker (patient safety)</li>
+                <li>Prescription Management (digital)</li>
+                <li>Symptom-Based Search</li>
+                <li>Fraud Detection (prescription fraud)</li>
+                <li>Expiry Alerts</li>
+                <li>Patient History (complete medication records)</li>
+            </ul>
+            <p><strong>Required Permissions:</strong> Prescription (View, Create, Verify), Medication (Dispense), Controlled Substance (Manage)</p>
+            <div class="code-block">
+PharmacyExtension:
+  MaxPrescriptionRefills: 3
+  ControlledSubstanceTracking: true
+  RequiresPharmacistApproval: true
+  ExpiryWarningDays: 30
+  EnableDrugInteractions: true
+            </div>
+        </div>
+        <div>
+            <h3><i class="fas fa-tshirt" style="color:#b8860b;"></i> Clothing Extension</h3>
+            <ul>
+                <li>Size Recommendation (perfect fit)</li>
+                <li>Trend Prediction</li>
+                <li>Color Coordination (style suggestions)</li>
+                <li>Virtual Try-On</li>
+                <li>Outfit Suggestions</li>
+                <li>Sustainability (eco-friendly options)</li>
+            </ul>
+            <p><strong>Required Permissions:</strong> Size (View, Recommend), Trends (View, Manage), Inventory (Manage)</p>
+            <div class="code-block">
+ClothingExtension:
+  EnableVirtualTryOn: true
+  SizePredictionModel: v2.0
+  TrendAnalysisFrequency: daily
+  SustainabilityScoring: true
+            </div>
+        </div>
+        <div>
+            <h3><i class="fas fa-utensils" style="color:#b8860b;"></i> Restaurant Extension</h3>
+            <ul>
+                <li>Menu Optimization (profitability)</li>
+                <li>Dynamic Pricing (real-time adjustments)</li>
+                <li>Food Quality Prediction</li>
+                <li>Customer Preferences (personalized menus)</li>
+                <li>Ingredient Management</li>
+                <li>Allergy Management (safety)</li>
+            </ul>
+            <p><strong>Required Permissions:</strong> Menu (View, Manage), Pricing (Update), Orders (Process)</p>
+            <div class="code-block">
+RestaurantExtension:
+  DynamicPricingEnabled: true
+  PeakHourPricing: 1.2
+  OffPeakDiscount: 0.15
+  RamadanPricing: 0.9
+  AllergenTracking: true
+            </div>
+        </div>
+        <div>
+            <h3><i class="fas fa-shopping-basket" style="color:#b8860b;"></i> SuperShop Extension</h3>
+            <ul>
+                <li>Smart Shopping Lists (personalized)</li>
+                <li>Expiry Management (reduce waste)</li>
+                <li>Shopping Patterns (behavior analysis)</li>
+                <li>Bulk Discounts (volume pricing)</li>
+                <li>Supplier Management (supply chain)</li>
+                <li>Customer Loyalty (rewards program)</li>
+            </ul>
+            <p><strong>Required Permissions:</strong> Inventory (Manage), Suppliers (Manage), Discounts (Apply)</p>
+            <div class="code-block">
+SuperShopExtension:
+  ExpiryMonitoringEnabled: true
+  LoyaltyProgramEnabled: true
+  BulkDiscountThreshold: 10
+  SupplierRatingEnabled: true
+  AutoReorderEnabled: true
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. SECURITY & COMPLIANCE -->
+    <h2 id="security"><i class="fas fa-shield-alt"></i> Security & Compliance</h2>
+    <h3>Security Features</h3>
+    <ul>
+        <li><strong>Authentication & Authorization:</strong> MFA (TOTP, SMS), RBAC, JWT tokens, session management, strong password policy</li>
+        <li><strong>Data Protection:</strong> Encryption at rest (database), encryption in transit (TLS 1.3), PII masking, anonymization (GDPR), secure storage (Key Vault)</li>
+        <li><strong>Security Monitoring:</strong> Real-time alerts, complete audit trail, vulnerability scanning, annual penetration testing, DDoS protection</li>
+    </ul>
+    <h3>Compliance Requirements</h3>
+    <ul>
+        <li><strong>Regulatory:</strong> GDPR, PDPL, HIPAA (healthcare), PCI-DSS (payment), ISO 27001</li>
+        <li><strong>Audit:</strong> Complete audit trails, access logs, change management, data retention, compliance reporting</li>
+    </ul>
+
+    <!-- 11. MONITORING & OBSERVABILITY -->
+    <h2 id="monitoring"><i class="fas fa-chart-pie"></i> Monitoring & Observability</h2>
+    <h3>Monitoring Stack</h3>
+    <ul>
+        <li><strong>Infrastructure:</strong> Prometheus (metrics), Grafana (visualization), ELK Stack (logging), Jaeger (tracing), AlertManager</li>
+        <li><strong>Application:</strong> Health checks (/health), performance metrics, business metrics (orders, revenue), error tracking (Sentry/App Insights), user analytics</li>
+        <li><strong>AI Monitoring:</strong> Model performance (accuracy, latency), API usage (token consumption), cost tracking, quality metrics, feedback loop</li>
+    </ul>
+    <h3>Key Metrics</h3>
+    <table class="feature-table">
+        <tr><th>Metric</th><th>Target</th><th>Alert</th></tr>
+        <tr><td>CPU Usage</td><td>&lt; 70%</td><td>&gt; 85%</td></tr>
+        <tr><td>Memory Usage</td><td>&lt; 75%</td><td>&gt; 90%</td></tr>
+        <tr><td>Disk Usage</td><td>&lt; 80%</td><td>&gt; 85%</td></tr>
+        <tr><td>Error Rate</td><td>&lt; 1%</td><td>&gt; 5%</td></tr>
+        <tr><td>Response Time</td><td>&lt; 200ms</td><td>&gt; 500ms</td></tr>
+        <tr><td>AI Accuracy</td><td>&gt; 90%</td><td>&lt; 80%</td></tr>
+        <tr><td>API Success</td><td>&gt; 99%</td><td>&lt; 95%</td></tr>
+    </table>
+
+    <!-- 12. DEVELOPMENT ROADMAP -->
+    <h2 id="roadmap"><i class="fas fa-calendar-check"></i> Development Roadmap</h2>
+    <div class="timeline">
+        <div class="timeline-item"><span class="phase">Month 1-2</span> Foundation: Project setup, shared libraries, database setup, Identity/Tenant services, CI/CD</div>
+        <div class="timeline-item"><span class="phase">Month 3-4</span> Core Services: Catalog, Inventory, Order, Payment, Admin dashboard</div>
+        <div class="timeline-item"><span class="phase">Month 5-6</span> Business Extensions: Pharmacy (drug interactions), Clothing (size rec), Restaurant (menu opt), SuperShop (expiry)</div>
+        <div class="timeline-item"><span class="phase">Month 7-8</span> AI Integration: Set up AI services, prompt engineering, RAG pipeline, basic model deployment</div>
+        <div class="timeline-item"><span class="phase">Month 9-10</span> Advanced AI Features: Recommendations, forecasting, chatbot, dynamic pricing, anomaly detection</div>
+        <div class="timeline-item"><span class="phase">Month 11-12</span> Enterprise Features: SSO, multi-branch, mobile app (React Native), marketplace, complete API docs</div>
+    </div>
+
+    <!-- 13. TEAM STRUCTURE -->
+    <h2 id="team"><i class="fas fa-users"></i> Team Structure</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; margin:0.6rem 0;">
+        <span class="pill"><i class="fas fa-user-tie"></i> Project Manager (1)</span>
+        <span class="pill"><i class="fas fa-code"></i> Backend Lead + 2 engineers</span>
+        <span class="pill"><i class="fas fa-laptop"></i> Frontend Lead + 2 engineers</span>
+        <span class="pill"><i class="fas fa-brain"></i> AI/ML Lead + 2 AI engineers</span>
+        <span class="pill"><i class="fas fa-cloud"></i> DevOps Lead (1)</span>
+        <span class="pill"><i class="fas fa-check-double"></i> QA Lead + 2 QA engineers</span>
+        <span class="pill"><i class="fas fa-lightbulb"></i> Product Manager (1)</span>
+    </div>
+    <p><strong>Skills:</strong> Backend (.NET 9, PostgreSQL, Microservices), Frontend (React, Next.js, TypeScript), AI (LLMs, Prompt Engineering, RAG), DevOps (Kubernetes, Docker, CI/CD), QA (Testing, Automation), Product (Agile, Domain knowledge).</p>
+
+    <!-- 14. GO-LIVE CHECKLIST -->
+    <h2 id="golive"><i class="fas fa-rocket"></i> Go-Live Checklist</h2>
+    <div class="grid-2col">
+        <div>
+            <h3>Pre-Launch</h3>
+            <ul>
+                <li><i class="far fa-circle"></i> All services deployed</li>
+                <li><i class="far fa-circle"></i> Database migrations applied</li>
+                <li><i class="far fa-circle"></i> DNS configured</li>
+                <li><i class="far fa-circle"></i> SSL certificates installed</li>
+                <li><i class="far fa-circle"></i> Monitoring configured</li>
+                <li><i class="far fa-circle"></i> Backups configured</li>
+                <li><i class="far fa-circle"></i> Security scans & penetration testing completed</li>
+                <li><i class="far fa-circle"></i> Compliance review</li>
+                <li><i class="far fa-circle"></i> Production secrets configured</li>
+                <li><i class="far fa-circle"></i> All microservices health checks passing</li>
+                <li><i class="far fa-circle"></i> API gateway configured</li>
+                <li><i class="far fa-circle"></i> Kafka topics created</li>
+                <li><i class="far fa-circle"></i> Redis cache working</li>
+                <li><i class="far fa-circle"></i> Admin dashboard live</li>
+                <li><i class="far fa-circle"></i> Mobile app published (if applicable)</li>
+                <li><i class="far fa-circle"></i> POS system tested</li>
+                <li><i class="far fa-circle"></i> Responsive design verified</li>
+                <li><i class="far fa-circle"></i> AI APIs configured and prompt templates optimized</li>
+                <li><i class="far fa-circle"></i> Vector database populated</li>
+                <li><i class="far fa-circle"></i> Error handling and cost monitoring configured</li>
+                <li><i class="far fa-circle"></i> Pricing defined, payment gateway configured</li>
+                <li><i class="far fa-circle"></i> Email templates and customer support setup</li>
+                <li><i class="far fa-circle"></i> Legal terms prepared</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Launch Day</h3>
+            <ul>
+                <li><strong>T-24 hours:</strong> Final testing, documentation ready, support briefed, marketing materials ready, backup verified</li>
+                <li><strong>T-0:</strong> Deploy to production, DNS propagation check, service health check, security verification, monitoring verification</li>
+                <li><strong>T+24 hours:</strong> Monitor errors, collect feedback, performance review, cost assessment, user support active</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 15. SUCCESS METRICS -->
+    <h2 id="metrics"><i class="fas fa-tachometer-alt"></i> Success Metrics</h2>
+    <div class="grid-2col">
+        <div>
+            <h3>Business Metrics</h3>
+            <table class="feature-table">
+                <tr><th>Metric</th><th>Target</th></tr>
+                <tr><td>Revenue Growth</td><td>25% MoM</td></tr>
+                <tr><td>Customer Acquisition</td><td>50/month</td></tr>
+                <tr><td>Customer Retention</td><td>95%</td></tr>
+                <tr><td>ARPU</td><td>$100/month</td></tr>
+                <tr><td>LTV</td><td>$5,000</td></tr>
+            </table>
+        </div>
+        <div>
+            <h3>Technical Metrics</h3>
+            <table class="feature-table">
+                <tr><th>Metric</th><th>Target</th></tr>
+                <tr><td>Uptime</td><td>99.9%</td></tr>
+                <tr><td>API Latency</td><td>&lt; 200ms</td></tr>
+                <tr><td>Error Rate</td><td>&lt; 1%</td></tr>
+                <tr><td>Database Query</td><td>&lt; 50ms</td></tr>
+                <tr><td>Cache Hit Rate</td><td>90%</td></tr>
+            </table>
+        </div>
+        <div>
+            <h3>AI Performance</h3>
+            <table class="feature-table">
+                <tr><th>Metric</th><th>Target</th></tr>
+                <tr><td>Recommendation Accuracy</td><td>85% (CTR)</td></tr>
+                <tr><td>Prediction Accuracy</td><td>90%</td></tr>
+                <tr><td>Chatbot Resolution</td><td>80%</td></tr>
+                <tr><td>Response Time</td><td>&lt; 2s</td></tr>
+                <tr><td>Cost per Request</td><td>&lt; $0.01</td></tr>
+            </table>
+        </div>
+        <div>
+            <h3>User Experience</h3>
+            <table class="feature-table">
+                <tr><th>Metric</th><th>Target</th></tr>
+                <tr><td>NPS</td><td>&gt; 50</td></tr>
+                <tr><td>Daily Active Users</td><td>1,000</td></tr>
+                <tr><td>Session Duration</td><td>&gt; 10 min</td></tr>
+                <tr><td>Bounce Rate</td><td>&lt; 30%</td></tr>
+                <tr><td>Conversion Rate</td><td>&gt; 5%</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 16. BUDGET ESTIMATION -->
+    <h2 id="budget"><i class="fas fa-coins"></i> Budget Estimation</h2>
+    <div class="note-info">
+        <i class="fas fa-info-circle" style="color:#b8860b; margin-right:8px;"></i>
+        <strong>Assumption:</strong> $500,000 ÷ 15 people ÷ 12 months ≈ $2,780/person/month, which assumes an offshore or blended-rate team. Adjust if hiring at local/onshore market rates for the leads described in Team Structure.
+    </div>
+    <h3>Development Costs (12 months)</h3>
+    <table class="feature-table">
+        <tr><th>Category</th><th>Cost (USD)</th><th>Description</th></tr>
+        <tr><td>Team Salaries</td><td>$500,000</td><td>15 developers</td></tr>
+        <tr><td>Infrastructure</td><td>$50,000</td><td>Cloud + Databases</td></tr>
+        <tr><td>AI Services</td><td>$100,000</td><td>LLM API costs</td></tr>
+        <tr><td>Software</td><td>$20,000</td><td>Tools + Licenses</td></tr>
+        <tr><td>Testing</td><td>$10,000</td><td>QA + Testing tools</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>$680,000</strong></td><td></td></tr>
+    </table>
+
+    <h3>Monthly Operations</h3>
+    <table class="feature-table">
+        <tr><th>Category</th><th>Cost (USD)</th><th>Description</th></tr>
+        <tr><td>Cloud Costs</td><td>$3,000</td><td>Kubernetes + Databases</td></tr>
+        <tr><td>AI Services</td><td>$5,000</td><td>Gemini/DeepSeek/Claude APIs</td></tr>
+        <tr><td>Support</td><td>$2,000</td><td>Customer support</td></tr>
+        <tr><td>Marketing</td><td>$1,000</td><td>Marketing activities</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>$11,000</strong></td><td></td></tr>
+    </table>
+
+    <h3>Initial Investment Requirements</h3>
+    <table class="feature-table">
+        <tr><th>Item</th><th>Cost (USD)</th></tr>
+        <tr><td>Development</td><td>$680,000</td></tr>
+        <tr><td>Marketing Launch</td><td>$50,000</td></tr>
+        <tr><td>Legal & Compliance</td><td>$20,000</td></tr>
+        <tr><td>Contingency (20%)</td><td>$150,000</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>$900,000</strong></td></tr>
+    </table>
+
+    <h3>Revenue Projections</h3>
+    <table class="feature-table">
+        <tr><th>Year</th><th>Revenue</th><th>Growth</th></tr>
+        <tr><td>Year 1</td><td>$500,000</td><td>100%</td></tr>
+        <tr><td>Year 2</td><td>$1,200,000</td><td>140%</td></tr>
+        <tr><td>Year 3</td><td>$2,500,000</td><td>108%</td></tr>
+        <tr><td>Year 4</td><td>$4,000,000</td><td>60%</td></tr>
+        <tr><td>Year 5</td><td>$6,000,000</td><td>50%</td></tr>
+    </table>
+
+    <hr>
+    <div style="text-align: center; color: #64748b; font-size: 0.9rem; padding-top: 1rem;">
+        <i class="fas fa-file-alt"></i> Document Version 2.0 · Complete Implementation Guide · August 2026
+    </div>
+
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f3d37c40', primaryBorderColor: '#b8860b', lineColor: '#4b5563' } });
+</script>
+</body>
+</html>

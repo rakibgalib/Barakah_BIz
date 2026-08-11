@@ -2,28 +2,28 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Barakah.IdentityService</RootNamespace>
+    <UserSecretsId>barakah-identity-service</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageReference Include="MediatR" Version="14.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.9" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
-    <PackageReference Include="Polly" Version="8.7.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\SharedKernel\Barakah.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\..\Shared\EventBus\Barakah.EventBus.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Persistence\Barakah.Persistence.csproj" />
-    <ProjectReference Include="..\..\..\Shared\TenantContext\Barakah.TenantContext.csproj" />
+    <ProjectReference Include="..\..\Shared\Barakah.SharedKernel\Barakah.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\Shared\Barakah.Persistence\Barakah.Persistence.csproj" />
+    <ProjectReference Include="..\..\Shared\Barakah.TenantContext\Barakah.TenantContext.csproj" />
+    <ProjectReference Include="..\..\Shared\Barakah.EventBus\Barakah.EventBus.csproj" />
   </ItemGroup>
 
 </Project>

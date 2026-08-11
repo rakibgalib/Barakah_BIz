@@ -27,6 +27,33 @@ CREATE TABLE IF NOT EXISTS public.tenants (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create users table (shared) — platform login accounts (admin/portal/POS staff),
+-- distinct from the per-tenant `employees` table created in create_tenant_schema() below.
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID REFERENCES public.tenants(id),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    is_active BOOLEAN DEFAULT true,
+    email_verified BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create refresh_tokens table (shared) — JWT refresh tokens issued by Identity Service.
+-- Tokens are stored hashed; the raw token is only ever seen by the client.
+CREATE TABLE IF NOT EXISTS public.refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    token_hash VARCHAR(255) UNIQUE NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    revoked_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create roles table (shared)
 CREATE TABLE IF NOT EXISTS public.roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -112,10 +139,21 @@ INSERT INTO public.permissions (resource, action, description) VALUES
 ('employees', 'view', 'View employee details'),
 ('employees', 'manage_schedule', 'Manage work schedules');
 
+-- Indexes for users / refresh_tokens
+CREATE INDEX IF NOT EXISTS idx_users_tenant ON public.users(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON public.refresh_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON public.refresh_tokens(expires_at);
+
 -- Mark reference tables for Citus replication
 SELECT create_reference_table('countries');
 SELECT create_reference_table('business_types');
 SELECT create_reference_table('tenants');
+SELECT create_reference_table('users');
+SELECT create_reference_table('roles');
+SELECT create_reference_table('permissions');
+SELECT create_reference_table('role_permissions');
+SELECT create_reference_table('user_roles');
+SELECT create_reference_table('refresh_tokens');
 
 -- Function to create tenant schema dynamically
 CREATE OR REPLACE FUNCTION create_tenant_schema(tenant_id TEXT)
@@ -200,6 +238,34 @@ BEGIN
     ', schema_name, schema_name, schema_name);
     
     EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.payments (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            order_id UUID NOT NULL REFERENCES %I.orders(id),
+            amount DECIMAL(10,2) NOT NULL,
+            method VARCHAR(50) NOT NULL,
+            status VARCHAR(50) NOT NULL DEFAULT ''pending'',
+            transaction_reference VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ', schema_name, schema_name);
+
+    EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.notifications (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            order_id UUID,
+            channel VARCHAR(50) NOT NULL,
+            recipient VARCHAR(255) NOT NULL,
+            message TEXT NOT NULL,
+            status VARCHAR(50) NOT NULL DEFAULT ''Pending'',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            sent_at TIMESTAMP
+        )
+    ', schema_name);
+
+    EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I.employees (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             tenant_id UUID NOT NULL,
@@ -227,6 +293,7 @@ BEGIN
     EXECUTE format('CREATE INDEX IF NOT EXISTS idx_%I_orders_branch ON %I.orders(branch_id)', schema_name, schema_name);
     EXECUTE format('CREATE INDEX IF NOT EXISTS idx_%I_orders_status ON %I.orders(status)', schema_name, schema_name);
     EXECUTE format('CREATE INDEX IF NOT EXISTS idx_%I_order_items_order ON %I.order_items(order_id)', schema_name, schema_name);
+    EXECUTE format('CREATE INDEX IF NOT EXISTS idx_%I_payments_order ON %I.payments(order_id)', schema_name, schema_name);
     EXECUTE format('CREATE INDEX IF NOT EXISTS idx_%I_employees_tenant ON %I.employees(tenant_id)', schema_name, schema_name);
     EXECUTE format('CREATE INDEX IF NOT EXISTS idx_%I_employees_email ON %I.employees(email)', schema_name, schema_name);
     

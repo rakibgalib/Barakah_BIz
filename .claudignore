@@ -1,0 +1,4 @@
+# .claudignore
+graph.json
+graphify-out/
+CLAUDE.md

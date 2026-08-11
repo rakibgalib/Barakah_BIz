@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f5ef;
+  --foreground: #211d16;
+
+  /* Brand: refined Islamic green, desaturated for daily-use screen density */
+  --color-brand-950: #051a10;
+  --color-brand-900: #0a2818;
+  --color-brand-800: #0f3d24;
+  --color-brand-700: #155330;
+  --color-brand-600: #1c6b3f;
+  --color-brand-500: #26854f;
+  --color-brand-400: #4da873;
+  --color-brand-300: #86c39d;
+  --color-brand-200: #b9ddc7;
+  --color-brand-100: #dcefe2;
+  --color-brand-50: #f2f8f4;
+
+  /* Accent: muted gold, used sparingly for active/primary emphasis */
+  --color-gold-700: #8a6a25;
+  --color-gold-600: #a9822f;
+  --color-gold-500: #c49a3e;
+  --color-gold-400: #d9b45c;
+  --color-gold-200: #ecdba5;
+  --color-gold-100: #f7ecd2;
+
+  /* Neutrals: warm stone rather than default cool slate, for a distinct identity */
+  --color-ink-950: #17140f;
+  --color-ink-900: #221f19;
+  --color-ink-800: #322d24;
+  --color-ink-700: #4a453c;
+  --color-ink-600: #635c4f;
+  --color-ink-500: #797365;
+  --color-ink-400: #a49c8b;
+  --color-ink-300: #c9c3b6;
+  --color-ink-200: #ded9cd;
+  --color-ink-100: #efece3;
+  --color-ink-50: #f7f5ef;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-brand-950: var(--color-brand-950);
+  --color-brand-900: var(--color-brand-900);
+  --color-brand-800: var(--color-brand-800);
+  --color-brand-700: var(--color-brand-700);
+  --color-brand-600: var(--color-brand-600);
+  --color-brand-500: var(--color-brand-500);
+  --color-brand-400: var(--color-brand-400);
+  --color-brand-300: var(--color-brand-300);
+  --color-brand-200: var(--color-brand-200);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-50: var(--color-brand-50);
+
+  --color-gold-700: var(--color-gold-700);
+  --color-gold-600: var(--color-gold-600);
+  --color-gold-500: var(--color-gold-500);
+  --color-gold-400: var(--color-gold-400);
+  --color-gold-200: var(--color-gold-200);
+  --color-gold-100: var(--color-gold-100);
+
+  --color-ink-950: var(--color-ink-950);
+  --color-ink-900: var(--color-ink-900);
+  --color-ink-800: var(--color-ink-800);
+  --color-ink-700: var(--color-ink-700);
+  --color-ink-600: var(--color-ink-600);
+  --color-ink-500: var(--color-ink-500);
+  --color-ink-400: var(--color-ink-400);
+  --color-ink-300: var(--color-ink-300);
+  --color-ink-200: var(--color-ink-200);
+  --color-ink-100: var(--color-ink-100);
+  --color-ink-50: var(--color-ink-50);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-feature-settings: "tnum" 1;
+}
+
+@layer components {
+  .page-title {
+    @apply text-lg font-semibold tracking-tight text-ink-900;
+  }
+
+  .page-subtitle {
+    @apply mt-1 text-sm text-ink-500;
+  }
+
+  .section-label {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-ink-500;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-brand-700 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-ink-200 bg-white px-3.5 py-2 text-sm font-medium text-ink-700 shadow-sm transition-colors hover:border-ink-300 hover:bg-ink-50;
+  }
+
+  .input-field {
+    @apply w-full rounded-md border border-ink-200 bg-white px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink-700;
+  }
+
+  .card {
+    @apply rounded-lg border border-ink-200 bg-white p-5 shadow-[0_1px_2px_rgba(23,20,15,0.04)];
+  }
+}

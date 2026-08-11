@@ -1,0 +1,203 @@
+services:
+  postgres:
+    image: citusdata/citus:12.1
+    container_name: barakah-postgres
+    environment:
+      POSTGRES_USER: barakah
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-barakah_dev}
+      POSTGRES_DB: barakah
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barakah -d barakah"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: barakah-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  identity:
+    build:
+      context: .
+      dockerfile: src/Modules/IdentityService/Dockerfile
+    container_name: barakah-identity
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5001
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Jwt__Secret: ${JWT_SECRET:-dev-only-secret-do-not-use-in-production-min-32-chars}
+      Jwt__Issuer: barakah-identity-service
+      Jwt__Audience: barakah-platform
+    ports:
+      - "5001:5001"
+
+  tenant:
+    build:
+      context: .
+      dockerfile: src/Modules/TenantService/Dockerfile
+    container_name: barakah-tenant
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5003
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+    ports:
+      - "5003:5003"
+
+  catalog:
+    build:
+      context: .
+      dockerfile: src/Modules/CatalogService/Dockerfile
+    container_name: barakah-catalog
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5004
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+    ports:
+      - "5004:5004"
+
+  inventory:
+    build:
+      context: .
+      dockerfile: src/Modules/InventoryService/Dockerfile
+    container_name: barakah-inventory
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5005
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+    ports:
+      - "5005:5005"
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: barakah-kafka
+    environment:
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+    ports:
+      - "9092:9092"
+
+  order:
+    build:
+      context: .
+      dockerfile: src/Modules/OrderService/Dockerfile
+    container_name: barakah-order
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+      catalog:
+        condition: service_started
+      inventory:
+        condition: service_started
+      kafka:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5006
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+      Services__CatalogService: http://catalog:5004
+      Services__InventoryService: http://inventory:5005
+      Kafka__BootstrapServers: kafka:9092
+    ports:
+      - "5006:5006"
+
+  payment:
+    build:
+      context: .
+      dockerfile: src/Modules/PaymentService/Dockerfile
+    container_name: barakah-payment
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+      order:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5007
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+      Services__OrderService: http://order:5006
+    ports:
+      - "5007:5007"
+
+  notification:
+    build:
+      context: .
+      dockerfile: src/Modules/NotificationService/Dockerfile
+    container_name: barakah-notification
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+      kafka:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5011
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+      Kafka__BootstrapServers: kafka:9092
+      Kafka__GroupId: notification-service
+    ports:
+      - "5011:5011"
+
+  analytics:
+    build:
+      context: .
+      dockerfile: src/Modules/AnalyticsService/Dockerfile
+    container_name: barakah-analytics
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5012
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+    ports:
+      - "5012:5012"
+
+volumes:
+  postgres-data:
