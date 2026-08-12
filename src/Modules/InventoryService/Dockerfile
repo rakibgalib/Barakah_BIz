@@ -10,7 +10,7 @@ RUN dotnet restore src/Modules/InventoryService/Barakah.InventoryService.csproj
 
 COPY src/Shared/ src/Shared/
 COPY src/Modules/InventoryService/ src/Modules/InventoryService/
-RUN dotnet publish src/Modules/InventoryService/Barakah.InventoryService.csproj -c Release -o /app --no-restore
+RUN dotnet publish src/Modules/InventoryService/Barakah.InventoryService.csproj -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app

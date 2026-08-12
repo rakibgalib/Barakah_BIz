@@ -10,7 +10,7 @@ RUN dotnet restore src/Modules/CatalogService/Barakah.CatalogService.csproj
 
 COPY src/Shared/ src/Shared/
 COPY src/Modules/CatalogService/ src/Modules/CatalogService/
-RUN dotnet publish src/Modules/CatalogService/Barakah.CatalogService.csproj -c Release -o /app --no-restore
+RUN dotnet publish src/Modules/CatalogService/Barakah.CatalogService.csproj -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app

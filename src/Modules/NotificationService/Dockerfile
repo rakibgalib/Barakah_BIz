@@ -11,7 +11,7 @@ RUN dotnet restore src/Modules/NotificationService/Barakah.NotificationService.c
 
 COPY src/Shared/ src/Shared/
 COPY src/Modules/NotificationService/ src/Modules/NotificationService/
-RUN dotnet publish src/Modules/NotificationService/Barakah.NotificationService.csproj -c Release -o /app --no-restore
+RUN dotnet publish src/Modules/NotificationService/Barakah.NotificationService.csproj -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
