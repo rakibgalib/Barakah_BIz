@@ -15,6 +15,7 @@ public class NotificationDbContext(DbContextOptions<NotificationDbContext> optio
         {
             e.ToTable("notifications");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
             e.Property(x => x.OrderId).HasColumnName("order_id");
             e.Property(x => x.Channel).HasColumnName("channel");

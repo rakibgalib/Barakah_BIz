@@ -13,6 +13,7 @@ public class TenantDbContext(DbContextOptions<TenantDbContext> options) : DbCont
         {
             e.ToTable("tenants", "public");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.Name).HasColumnName("name");
             e.Property(x => x.Subdomain).HasColumnName("subdomain");
             e.Property(x => x.Email).HasColumnName("email");

@@ -15,6 +15,7 @@ public class PaymentDbContext(DbContextOptions<PaymentDbContext> options) : DbCo
         {
             e.ToTable("payments");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
             e.Property(x => x.OrderId).HasColumnName("order_id");
             e.Property(x => x.Amount).HasColumnName("amount");

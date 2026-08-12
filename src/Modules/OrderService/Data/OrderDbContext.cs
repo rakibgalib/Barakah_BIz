@@ -16,6 +16,7 @@ public class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContex
         {
             e.ToTable("orders");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
             e.Property(x => x.BranchId).HasColumnName("branch_id");
             e.Property(x => x.OrderNumber).HasColumnName("order_number");
@@ -38,6 +39,7 @@ public class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContex
         {
             e.ToTable("order_items");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
             e.Property(x => x.OrderId).HasColumnName("order_id");
             e.Property(x => x.ProductId).HasColumnName("product_id");

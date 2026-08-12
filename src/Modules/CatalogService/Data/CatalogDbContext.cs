@@ -15,6 +15,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbCo
         {
             e.ToTable("products");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
             e.Property(x => x.Sku).HasColumnName("sku");
             e.Property(x => x.Name).HasColumnName("name");

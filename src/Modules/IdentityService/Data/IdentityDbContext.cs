@@ -18,6 +18,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Db
         {
             e.ToTable("users", "public");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.Email).HasColumnName("email");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
             e.Property(x => x.PasswordHash).HasColumnName("password_hash");
@@ -35,6 +36,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Db
         {
             e.ToTable("roles", "public");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.Name).HasColumnName("name");
             e.Property(x => x.Description).HasColumnName("description");
             e.Property(x => x.IsSystemRole).HasColumnName("is_system_role");
@@ -46,6 +48,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Db
         {
             e.ToTable("permissions", "public");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.Resource).HasColumnName("resource");
             e.Property(x => x.Action).HasColumnName("action");
             e.Property(x => x.Description).HasColumnName("description");
@@ -67,6 +70,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Db
         {
             e.ToTable("user_roles", "public");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.UserId).HasColumnName("user_id");
             e.Property(x => x.RoleId).HasColumnName("role_id");
             e.Property(x => x.TenantId).HasColumnName("tenant_id");
@@ -84,6 +88,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Db
         {
             e.ToTable("refresh_tokens", "public");
             e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id");
             e.Property(x => x.UserId).HasColumnName("user_id");
             e.Property(x => x.TokenHash).HasColumnName("token_hash");
             e.Property(x => x.ExpiresAt).HasColumnName("expires_at");
