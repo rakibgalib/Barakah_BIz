@@ -266,6 +266,26 @@ BEGIN
     ', schema_name);
 
     EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.prescriptions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            patient_id VARCHAR(255) NOT NULL,
+            patient_name VARCHAR(255) NOT NULL,
+            product_id UUID,
+            medication_name VARCHAR(255) NOT NULL,
+            quantity INTEGER NOT NULL,
+            prescribed_by VARCHAR(255) NOT NULL,
+            refills_allowed INTEGER NOT NULL DEFAULT 0,
+            refills_used INTEGER NOT NULL DEFAULT 0,
+            is_controlled_substance BOOLEAN NOT NULL DEFAULT false,
+            requires_pharmacist_approval BOOLEAN NOT NULL DEFAULT false,
+            status VARCHAR(50) NOT NULL DEFAULT ''Active'',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP NOT NULL
+        )
+    ', schema_name);
+
+    EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I.employees (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             tenant_id UUID NOT NULL,

@@ -263,6 +263,49 @@ that's not the right call — no gateway exists in code, only in `doc.html`'s ar
   against a real Identity Service — none of this can be exercised until Postgres/Kafka are running
 - [ ] Gateway-vs-direct-CORS-calls decision (see Assumption above) — not yet confirmed by the user
 
+## Phase 3, slice 1: Pharmacy Extension (2026-08-12) — code complete, Docker verification not yet re-run
+
+Starts Month 5-6 ("Business Extensions"). Scoped down the same way every prior phase was: one
+extension at a time (Pharmacy first, matching `doc.html`'s own listing order), and within Pharmacy,
+only the non-AI features. `doc.html` lists six Pharmacy Extension features — three of them (Drug
+Interaction Checker, Symptom-Based Search, Fraud Detection) need a real drug-interaction knowledge
+base or anomaly-detection AI, which `doc.html` itself scopes to the project's AI Integration phase
+(Month 7-8). Building fake versions of those now would be worse than not building them — same
+reasoning as Payment Service being a ledger instead of a fake Stripe integration.
+
+### Pharmacy Service (`src/Modules/PharmacyService/`), port 5008
+- [x] `Prescription` entity, tenant-scoped (`prescriptions` table added to `create_tenant_schema()`
+  in `scripts/init-db.sql`, following the exact pattern already used for `payments`/`notifications`)
+- [x] **Prescription Management**: `POST /api/prescriptions`, `GET /api/prescriptions/{id}`
+- [x] **Patient History**: `GET /api/prescriptions/patient/{patientId}` — full medication record
+  for one patient, ordered newest-first
+- [x] **Expiry Alerts**: `GET /api/prescriptions/expiring` — active prescriptions expiring within
+  the configured warning window
+- [x] Refill flow: `POST /api/prescriptions/{id}/refill` — enforces refill count against
+  `RefillsAllowed`, blocks refills on expired/pending-approval/non-active prescriptions
+- [x] `PharmacyOptions` config class mirrors `doc.html`'s `PharmacyExtension` YAML block exactly
+  (`MaxPrescriptionRefills`, `ControlledSubstanceTracking`, `RequiresPharmacistApproval`,
+  `ExpiryWarningDays`) — bound from an actual `PharmacyExtension` appsettings section, not just
+  documented as a config shape. Controlled substances above the approval threshold are created in
+  `PendingApproval` status and can't be refilled until that's resolved.
+- [x] Same conventions as every other service: `TenantResolutionMiddleware` + `X-Tenant-Subdomain`
+  header + `UseTenantSchemaAsync` guard, no JWT auth (matches the rest of the platform), CORS via
+  `SetIsOriginAllowed(_ => true)`
+- [x] Registered in `BarakahPlatform.sln` and `docker-compose.yml` (same block pattern as every
+  other service — depends on postgres + tenant, no Kafka dependency)
+- [x] `dotnet build` — 0 errors; `dotnet test` — 10/10 still passing, no regressions
+
+### Explicitly not built this slice
+- Drug Interaction Checker, Symptom-Based Search, Fraud Detection — deferred to AI Integration
+  phase per `doc.html`'s own plan (see above)
+- No admin dashboard page yet — Notifications/Analytics got dashboard pages the same session they
+  were built; Pharmacy didn't, to keep this slice's scope contained. Natural next step if pharmacy
+  data needs to be visible in the UI.
+- No live verification in this specific session — built and pushed alongside the live-verified
+  Codespaces work earlier, but the fixes (Kafka image, Dockerfile `--no-restore`, EF `Id` column
+  mapping) all predate this service, so it should inherit them correctly; hasn't been individually
+  round-tripped against a running Postgres yet.
+
 ## Open decisions carried forward
 - Subscription pricing (Basic/Professional/Enterprise/Pharmacy/Restaurant/Clothing/SuperShop) is "TBD" in `doc.html` — set when ready.
 - Citus-from-day-one vs. deferring sharding — flagged as an assumption in `doc.html`, not yet revisited.
