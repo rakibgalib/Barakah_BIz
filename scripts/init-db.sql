@@ -301,6 +301,44 @@ BEGIN
     ', schema_name);
 
     EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.suppliers (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            contact_email VARCHAR(255),
+            contact_phone VARCHAR(50),
+            rating DECIMAL(2,1),
+            is_active BOOLEAN NOT NULL DEFAULT true,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ', schema_name);
+
+    EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.loyalty_accounts (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            customer_id VARCHAR(255) NOT NULL,
+            points_balance INTEGER NOT NULL DEFAULT 0,
+            total_points_earned INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (customer_id)
+        )
+    ', schema_name);
+
+    EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.product_batches (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            product_id UUID,
+            batch_number VARCHAR(100) NOT NULL,
+            quantity INTEGER NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ', schema_name);
+
+    EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I.employees (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             tenant_id UUID NOT NULL,

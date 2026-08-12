@@ -341,6 +341,36 @@ much better split.
   doc comment.
 - No admin dashboard page yet, same reasoning as Pharmacy
 
+## Phase 3, slice 3: SuperShop Extension (2026-08-12) — code complete, Docker verification not yet re-run
+
+### SuperShop Service (`src/Modules/SuperShopService/`), port 5014
+- [x] **Supplier Management**: `Supplier` entity, CRUD + `PATCH /api/suppliers/{id}/rating`
+- [x] **Customer Loyalty**: `LoyaltyAccount` entity, `GET/POST /api/loyalty/earn`,
+  `POST /api/loyalty/{customerId}/redeem` — points balance + lifetime-earned tracking
+- [x] **Expiry Management**: `ProductBatch` entity, `GET /api/product-batches/expiring` — same
+  pattern as Pharmacy's prescription expiry alerts, applied to batch-level stock instead
+- [x] **Bulk Discounts** (rule-based, not AI): stateless `POST /api/pricing/bulk-discount` applies
+  `doc.html`'s `BulkDiscountThreshold` against a configured discount percentage
+- [x] `SuperShopOptions` config class mirrors `doc.html`'s `SuperShopExtension` block
+  (`ExpiryMonitoringEnabled`, `LoyaltyProgramEnabled`, `BulkDiscountThreshold`,
+  `SupplierRatingEnabled`) bound from a real `SuperShopExtension` appsettings section
+- [x] `suppliers`, `loyalty_accounts`, `product_batches` tables added to
+  `create_tenant_schema()` in `scripts/init-db.sql`
+- [x] Same conventions as every other service; registered in `.sln`/`docker-compose.yml`
+- [x] `dotnet build` — 0 errors; `dotnet test` — 10/10 still passing, no regressions
+
+### Explicitly not built this slice
+- Smart Shopping Lists (personalized) and Shopping Patterns (behavior analysis) — both need real
+  recommendation/behavioral AI, deferred to the AI Integration phase
+- `AutoReorderEnabled` from `doc.html`'s config block is not implemented — automatic reordering
+  needs demand-pattern intelligence, same reasoning as the above
+- No admin dashboard page yet, same reasoning as Pharmacy/Restaurant
+
+**Phase 3 status**: 3 of 4 extensions done (Pharmacy, Restaurant, SuperShop). Clothing remains —
+deliberately skipped so far since 5 of its 6 features are AI-dependent (see the Restaurant slice
+note above); revisit once the AI Integration phase makes those buildable, or build the thin
+Sustainability-only slice if it's wanted sooner.
+
 ## Open decisions carried forward
 - Subscription pricing (Basic/Professional/Enterprise/Pharmacy/Restaurant/Clothing/SuperShop) is "TBD" in `doc.html` — set when ready.
 - Citus-from-day-one vs. deferring sharding — flagged as an assumption in `doc.html`, not yet revisited.
