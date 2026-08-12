@@ -306,6 +306,41 @@ reasoning as Payment Service being a ledger instead of a fake Stripe integration
   mapping) all predate this service, so it should inherit them correctly; hasn't been individually
   round-tripped against a running Postgres yet.
 
+## Phase 3, slice 2: Restaurant Extension (2026-08-12) — code complete, Docker verification not yet re-run
+
+Jumped ahead of Clothing Extension in `doc.html`'s listing order — flagged and explained at the
+time: Clothing's six features are almost entirely AI-dependent (Size Recommendation needs a
+prediction model, Trend Prediction, Color Coordination, Virtual Try-On, and Outfit Suggestions are
+all AI; only Sustainability isn't), too thin a slice to justify a new service. Restaurant has a
+much better split.
+
+### Restaurant Service (`src/Modules/RestaurantService/`), port 5010
+- [x] `MenuItem` entity, tenant-scoped (`menu_items` table added to `create_tenant_schema()`)
+- [x] Menu Management: full CRUD (`POST/GET/PUT/DELETE /api/menu-items`, `GET .../{id}`)
+- [x] **Allergy Management**: `GET /api/menu-items/allergen-free?exclude=nuts,dairy` — filters out
+  any item carrying an excluded allergen tag
+- [x] **Dynamic Pricing** (rule-based, not AI): `GET /api/menu-items/{id}/price` applies
+  `doc.html`'s own multipliers (`PeakHourPricing`, `OffPeakDiscount`, `RamadanPricing`) via a
+  `RestaurantOptions` config class bound to a real `RestaurantExtension` appsettings section — same
+  "config block becomes real behavior" pattern as Pharmacy's `PharmacyOptions`
+- [x] **Ingredient Management** interpreted as menu-item composition/allergen tagging (`Description`
+  + `AllergenTags` fields) rather than a separate raw-ingredient-stock subsystem — that would
+  duplicate Inventory Service's domain; kept it in Restaurant's own scope instead
+- [x] Same conventions as every other service (tenant middleware, header guard, no JWT, permissive
+  CORS)
+- [x] Registered in `BarakahPlatform.sln` and `docker-compose.yml`
+- [x] `dotnet build` — 0 errors; `dotnet test` — 10/10 still passing, no regressions
+
+### Explicitly not built this slice
+- Menu Optimization (needs profitability analytics), Food Quality Prediction (AI), Customer
+  Preferences (AI personalization) — deferred to AI Integration phase
+- **"Peak hours" and "Ramadan period" are not computed** — `PeakHourStartUtc`/`PeakHourEndUtc` are
+  a fixed UTC window (11:00-14:00, an addition beyond what `doc.html` specifies), and
+  `IsRamadanPeriod` is a manually-toggled config flag, not a real Hijri calendar calculation. This
+  is an honest simplification, not a hidden gap — noted directly in `RestaurantOptions`'s own
+  doc comment.
+- No admin dashboard page yet, same reasoning as Pharmacy
+
 ## Open decisions carried forward
 - Subscription pricing (Basic/Professional/Enterprise/Pharmacy/Restaurant/Clothing/SuperShop) is "TBD" in `doc.html` — set when ready.
 - Citus-from-day-one vs. deferring sharding — flagged as an assumption in `doc.html`, not yet revisited.

@@ -286,6 +286,21 @@ BEGIN
     ', schema_name);
 
     EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.menu_items (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            base_price DECIMAL(10,2) NOT NULL,
+            category VARCHAR(100) NOT NULL,
+            allergen_tags VARCHAR(500),
+            is_available BOOLEAN NOT NULL DEFAULT true,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ', schema_name);
+
+    EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I.employees (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             tenant_id UUID NOT NULL,

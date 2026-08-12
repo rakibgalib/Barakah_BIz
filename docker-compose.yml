@@ -146,6 +146,24 @@ services:
     ports:
       - "5006:5006"
 
+  restaurant:
+    build:
+      context: .
+      dockerfile: src/Modules/RestaurantService/Dockerfile
+    container_name: barakah-restaurant
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenant:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5010
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=barakah;Username=barakah;Password=${POSTGRES_PASSWORD:-barakah_dev}
+      Services__TenantService: http://tenant:5003
+    ports:
+      - "5010:5010"
+
   payment:
     build:
       context: .
