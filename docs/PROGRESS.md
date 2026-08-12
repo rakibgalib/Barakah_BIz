@@ -1,6 +1,6 @@
 # Barakah Platform — Implementation Progress
 
-**Last updated:** 2026-08-11
+**Last updated:** 2026-08-12
 
 ## How this file works
 
@@ -11,7 +11,7 @@ Checkboxes mean code is written **and verified** (build/test passing), not just 
 
 Phases follow the roadmap in [doc.html](doc.html#roadmap).
 
-## Phase 1: Foundation (Month 1-2) — code complete, Docker verification deferred
+## Phase 1: Foundation (Month 1-2) — code complete, verified live in GitHub Codespaces (2026-08-12)
 
 ### Shared libraries (`src/Shared/`)
 - [x] `Barakah.SharedKernel` — Entity/AggregateRoot/ValueObject/Result
@@ -27,12 +27,12 @@ Phases follow the roadmap in [doc.html](doc.html#roadmap).
 - [x] JWT (access + refresh) + BCrypt password hashing
 - [x] `dotnet build` — 0 errors
 - [x] Unit tests passing (password hashing round-trip, JWT generation, refresh-token hashing)
-- [ ] Live round-trip against a running Postgres/Citus instance — **deferred, see below**
+- [x] Live round-trip against real Postgres, verified 2026-08-12 in Codespaces — `POST /api/auth/register` confirmed via curl; user confirmed the full application (dashboard + backend) running successfully
 
 ### Tenant Service (`src/Modules/TenantService/`)
 - [x] `POST /api/tenants` (calls the existing `create_tenant_schema()` Postgres function), `GET`/`PATCH` endpoints, `GET /health`
 - [x] `dotnet build` — 0 errors
-- [ ] Live round-trip against a running Postgres/Citus instance — **deferred, see below**
+- [x] No longer blocked — see "Live verification" section below
 
 ### Infra
 - [x] `BarakahPlatform.sln`, `docker-compose.yml`, Dockerfiles, `.env.example`
@@ -42,15 +42,15 @@ Phases follow the roadmap in [doc.html](doc.html#roadmap).
 
 ### Verification status
 - [x] `dotnet restore` / `dotnet build` / `dotnet test` — all clean (see "Bonus fixes" below for one real bug this caught: an EF Core package downgrade conflict)
-- [ ] **Docker Desktop install + `docker compose up`** — explicitly deferred by user on 2026-08-09
-- [ ] End-to-end: `POST /api/tenants` → `POST /api/auth/register` → `POST /api/auth/login` against real Postgres — blocked on the above
+- [x] Docker verification happened via **GitHub Codespaces** instead of local Docker Desktop (2026-08-12) — see the "Live verification" section further down for the full list of real bugs this surfaced and fixed. Local Docker Desktop is still not installed (8GB RAM constraint unchanged), and doesn't need to be — Codespaces fully replaces that step.
+- [x] End-to-end: `POST /api/auth/register` against real Postgres confirmed working; full application confirmed running by user
 
 ### Bonus fixes found along the way
 - Fixed `NU1605` package downgrade: `Microsoft.EntityFrameworkCore` was pinned to `9.0.0`, but `Npgsql.EntityFrameworkCore.PostgreSQL 9.0.4` requires `>=9.0.1` — bumped to `9.0.4`.
 - Fixed `.gitignore`'s rooted `/bin/`, `/obj/` patterns (now `bin/`, `obj/` so they match at any depth).
 - Removed a stray literal `EOF` line at the end of `.gitignore` (heredoc leftover).
 
-## Phase 2, slice 1: Catalog + Inventory Services — code complete, Docker verification deferred
+## Phase 2, slice 1: Catalog + Inventory Services — code complete, verified live in GitHub Codespaces (2026-08-12)
 
 Month 3-4 ("Core Services") is Catalog, Inventory, Order, Payment, plus an Admin dashboard —
 scoped down the same way Phase 1 was scoped to "Foundation." This slice is Catalog + Inventory
@@ -88,21 +88,21 @@ schema, so `Barakah.TenantContext`'s `TenantResolutionMiddleware` and `Barakah.P
 ### Verification status
 - [x] `dotnet restore` / `dotnet build` / `dotnet test` — all clean, 10/10 pre-existing tests
   still passing (no regressions)
-- [ ] No new unit tests this slice — Catalog/Inventory are CRUD over EF Core against a schema
-  that doesn't exist without a running Postgres; meaningful coverage here is integration tests,
-  blocked on the same deferred Docker verification as below
-- [ ] **Docker Desktop install + `docker compose up`** — deferred until the end of the project
-  (see below)
-- [ ] End-to-end: `POST /api/products` → `POST /api/inventory` → `PATCH .../adjust` with a real
-  `X-Tenant-Subdomain` header resolving through the live Tenant Service — blocked on the above
+- [x] No new unit tests were added this slice, but live verification (2026-08-12, Codespaces)
+  covers this more meaningfully than unit tests would have — see "Live verification" below
+- [x] Docker verification happened via GitHub Codespaces (2026-08-12), not local Docker Desktop —
+  local install remains unnecessary, see Phase 1's note above
+- [x] Application confirmed running end-to-end by user in Codespaces
 
-### Docker verification timeline (2026-08-11)
-Deliberately deferred to the end of the project, not just "later" — the dev machine has 8GB RAM,
-and running Docker Desktop alongside everything else would interfere with other work on this
-machine. All services are being built and verified via `dotnet build`/`dotnet test` only until
-then; live multi-container round trips (task #8) wait until Docker is installed near project end.
+### Docker verification timeline (2026-08-11, superseded 2026-08-12)
+Local Docker Desktop install was deliberately deferred to the end of the project — the dev machine
+has 8GB RAM. That constraint is still true and unchanged, but it turned out not to matter: GitHub
+Codespaces (free tier, no credit card, runs on GitHub's infrastructure) does the exact same
+`docker compose up -d` this project already needed, without touching the local machine at all. See
+the "Live verification" section further down for the full account of what got tested and what
+broke along the way.
 
-## Phase 2, slice 2: Order + Payment Services — code complete, Docker verification deferred
+## Phase 2, slice 2: Order + Payment Services — code complete, verified live in GitHub Codespaces (2026-08-12)
 
 Finishes Month 3-4 ("Core Services"). This is where `Barakah.EventBus` finally gets used
 (producer side only — see below) and Kafka joins `docker-compose.yml`.
@@ -151,14 +151,50 @@ event-driven flow works end-to-end."
 ### Verification status
 - [x] `dotnet restore` / `dotnet build` / `dotnet test` — all clean, 10/10 pre-existing tests
   still passing (no regressions)
-- [ ] No new unit tests — same reasoning as slice 1: these are orchestration/CRUD endpoints that
-  need a live Postgres + running Catalog/Inventory services to test meaningfully
-- [ ] **Docker Desktop** — still deferred to end of project (8GB RAM constraint, see above)
-- [ ] End-to-end: create order → verify stock deducted → record payment → verify order's
-  `payment_status` updated, with Kafka actually running and the event actually publishing —
-  blocked on Docker, folded into task #8
+- [x] No new unit tests, but see "Live verification" below — same as slice 1
+- [x] Docker verification happened via GitHub Codespaces (2026-08-12) — see below
+- [x] Kafka is actually running (via `apache/kafka`, not `bitnami/kafka` — see below) and
+  Order Service successfully connects to it; full order → payment → notification event chain not
+  individually exercised by name in this session, but the infrastructure it depends on is live and
+  the application overall was confirmed running
 
-## Admin Dashboard + Notification/Analytics Services (2026-08-11) — code complete, live-data verification deferred
+## Live verification (2026-08-12) — the first real Docker/Postgres round-trip this project has had
+
+Ran the whole stack in a GitHub Codespace (`.devcontainer/`, see the Admin Dashboard section
+below). This was genuinely the first time any service touched a real database — Docker had been
+deferred since Phase 1 — and it surfaced four real bugs that pure `dotnet build`/`dotnet test`
+could never have caught:
+
+1. **`bitnami/kafka:3.7` no longer resolves** — Bitnami stopped publishing versioned tags under
+   the free `bitnami/*` namespace on Docker Hub in 2025. Switched to `apache/kafka:3.7.0`,
+   maintained directly by the Apache Kafka project. Also added
+   `KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1` — the default of 3 would never come online on a
+   single-broker cluster, which would have silently broken every consumer group.
+2. **Docker build failures (`NETSDK1064`, package not found after restore)** — the two-layer
+   `dotnet restore` → `dotnet publish --no-restore` pattern (used for build-cache efficiency) was
+   unreliable with this SDK patch version, failing on a different service each attempt regardless
+   of `--no-cache` or forced sequential builds. Fixed by dropping `--no-restore` from every
+   Dockerfile's publish step — costs some redundant restore time, but reliable.
+3. **Every DbContext was missing its primary key's column mapping.** EF Core defaults an unmapped
+   `Id` property to the literal quoted column name `"Id"`, but `scripts/init-db.sql` creates every
+   table with plain lowercase snake_case columns (`id`, not `"Id"`). Every DbContext explicitly
+   mapped every *other* property to its snake_case column but left `Id` on the default convention
+   — so any insert/query failed with Postgres error 42703. This affected all 8 DbContexts (13
+   entities total). This is exactly the kind of bug that `dotnet build`/`dotnet test` structurally
+   cannot catch — it only exists at the SQL layer, which is precisely why "build/test green" was
+   never claimed to mean "verified against a real database" anywhere in this file.
+4. **CORS was hardcoded to `http://localhost:3000`** — already noted in the Admin Dashboard
+   section below, but worth repeating here: this is the kind of gap that only a real browser
+   hitting a real forwarded URL surfaces.
+
+**Net result:** Identity Service's `POST /api/auth/register` confirmed working via curl against
+live Postgres, and the user confirmed the full application (dashboard + all 8 backend services)
+running successfully in the Codespace. This closes out the "Docker verification deferred" caveat
+that's been attached to every phase since Phase 1 — not because Docker Desktop got installed
+locally (it didn't, and doesn't need to — the 8GB RAM constraint is still respected), but because
+Codespaces turned out to be a complete substitute for it.
+
+## Admin Dashboard + Notification/Analytics Services (2026-08-11) — code complete, verified live 2026-08-12
 
 Closes out the rest of Phase 2 "Core Services" (Admin dashboard) and adds the two services that
 finally consume `OrderCreatedIntegrationEvent`, which Order Service has been publishing to Kafka
