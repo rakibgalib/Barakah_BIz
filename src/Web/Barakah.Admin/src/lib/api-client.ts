@@ -91,6 +91,10 @@ const ORDER_URL = process.env.NEXT_PUBLIC_ORDER_URL ?? "http://localhost:5006";
 const PAYMENT_URL = process.env.NEXT_PUBLIC_PAYMENT_URL ?? "http://localhost:5007";
 const NOTIFICATION_URL = process.env.NEXT_PUBLIC_NOTIFICATION_URL ?? "http://localhost:5011";
 const ANALYTICS_URL = process.env.NEXT_PUBLIC_ANALYTICS_URL ?? "http://localhost:5012";
+const PHARMACY_URL = process.env.NEXT_PUBLIC_PHARMACY_URL ?? "http://localhost:5008";
+const RESTAURANT_URL = process.env.NEXT_PUBLIC_RESTAURANT_URL ?? "http://localhost:5010";
+const CLOTHING_URL = process.env.NEXT_PUBLIC_CLOTHING_URL ?? "http://localhost:5013";
+const SUPERSHOP_URL = process.env.NEXT_PUBLIC_SUPERSHOP_URL ?? "http://localhost:5014";
 
 export const identityApi = {
   me: () => apiFetch(IDENTITY_URL, "/api/users/me"),
@@ -195,4 +199,53 @@ export const analyticsApi = {
     link.remove();
     URL.revokeObjectURL(url);
   },
+};
+
+export const pharmacyApi = {
+  create: (body: unknown, tenantSubdomain: string) =>
+    apiFetch(PHARMACY_URL, "/api/prescriptions", { method: "POST", body, tenantSubdomain }),
+  listByPatient: (patientId: string, tenantSubdomain: string) =>
+    apiFetch(PHARMACY_URL, `/api/prescriptions/patient/${encodeURIComponent(patientId)}`, { tenantSubdomain }),
+  listExpiring: (tenantSubdomain: string) => apiFetch(PHARMACY_URL, "/api/prescriptions/expiring", { tenantSubdomain }),
+  refill: (id: string, tenantSubdomain: string) =>
+    apiFetch(PHARMACY_URL, `/api/prescriptions/${id}/refill`, { method: "POST", tenantSubdomain }),
+};
+
+export const restaurantApi = {
+  list: (tenantSubdomain: string) => apiFetch(RESTAURANT_URL, "/api/menu-items", { tenantSubdomain }),
+  create: (body: unknown, tenantSubdomain: string) =>
+    apiFetch(RESTAURANT_URL, "/api/menu-items", { method: "POST", body, tenantSubdomain }),
+  update: (id: string, body: unknown, tenantSubdomain: string) =>
+    apiFetch(RESTAURANT_URL, `/api/menu-items/${id}`, { method: "PUT", body, tenantSubdomain }),
+  remove: (id: string, tenantSubdomain: string) =>
+    apiFetch(RESTAURANT_URL, `/api/menu-items/${id}`, { method: "DELETE", tenantSubdomain }),
+  currentPrice: (id: string, tenantSubdomain: string) =>
+    apiFetch(RESTAURANT_URL, `/api/menu-items/${id}/price`, { tenantSubdomain }),
+};
+
+export const superShopApi = {
+  listSuppliers: (tenantSubdomain: string) => apiFetch(SUPERSHOP_URL, "/api/suppliers", { tenantSubdomain }),
+  createSupplier: (body: unknown, tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, "/api/suppliers", { method: "POST", body, tenantSubdomain }),
+  rateSupplier: (id: string, body: unknown, tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, `/api/suppliers/${id}/rating`, { method: "PATCH", body, tenantSubdomain }),
+  getLoyaltyAccount: (customerId: string, tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, `/api/loyalty/${encodeURIComponent(customerId)}`, { tenantSubdomain }),
+  earnPoints: (body: unknown, tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, "/api/loyalty/earn", { method: "POST", body, tenantSubdomain }),
+  redeemPoints: (customerId: string, body: unknown, tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, `/api/loyalty/${encodeURIComponent(customerId)}/redeem`, { method: "POST", body, tenantSubdomain }),
+  listExpiringBatches: (tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, "/api/product-batches/expiring", { tenantSubdomain }),
+  createBatch: (body: unknown, tenantSubdomain: string) =>
+    apiFetch(SUPERSHOP_URL, "/api/product-batches", { method: "POST", body, tenantSubdomain }),
+};
+
+export const clothingApi = {
+  getSustainabilityRating: (productId: string, tenantSubdomain: string) =>
+    apiFetch(CLOTHING_URL, `/api/sustainability-ratings/product/${productId}`, { tenantSubdomain }),
+  createSustainabilityRating: (body: unknown, tenantSubdomain: string) =>
+    apiFetch(CLOTHING_URL, "/api/sustainability-ratings", { method: "POST", body, tenantSubdomain }),
+  updateSustainabilityRating: (productId: string, body: unknown, tenantSubdomain: string) =>
+    apiFetch(CLOTHING_URL, `/api/sustainability-ratings/product/${productId}`, { method: "PUT", body, tenantSubdomain }),
 };

@@ -23,6 +23,10 @@ NEXT_PUBLIC_ORDER_URL=$(base 5006)
 NEXT_PUBLIC_PAYMENT_URL=$(base 5007)
 NEXT_PUBLIC_NOTIFICATION_URL=$(base 5011)
 NEXT_PUBLIC_ANALYTICS_URL=$(base 5012)
+NEXT_PUBLIC_PHARMACY_URL=$(base 5008)
+NEXT_PUBLIC_RESTAURANT_URL=$(base 5010)
+NEXT_PUBLIC_CLOTHING_URL=$(base 5013)
+NEXT_PUBLIC_SUPERSHOP_URL=$(base 5014)
 EOF
   echo "==> Wrote $ENV_FILE for Codespaces forwarded URLs (restart 'npm run dev' if it was already running)"
 else

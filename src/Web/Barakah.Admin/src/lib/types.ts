@@ -220,3 +220,130 @@ export interface SalesSummary {
   from: string;
   to: string;
 }
+
+// ---------- Pharmacy ----------
+
+export interface Prescription {
+  id: string;
+  tenantId: string;
+  patientId: string;
+  patientName: string;
+  productId: string;
+  medicationName: string;
+  quantity: number;
+  prescribedBy: string;
+  refillsAllowed: number;
+  refillsUsed: number;
+  isControlledSubstance: boolean;
+  requiresPharmacistApproval: boolean;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export interface CreatePrescriptionRequest {
+  patientId: string;
+  patientName: string;
+  productId: string;
+  medicationName: string;
+  quantity: number;
+  prescribedBy: string;
+  refillsAllowed: number;
+  isControlledSubstance: boolean;
+  expiresAt: string;
+}
+
+// ---------- Restaurant ----------
+
+export interface MenuItem {
+  id: string;
+  tenantId: string;
+  name: string;
+  description: string | null;
+  basePrice: number;
+  category: string;
+  allergenTags: string | null;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMenuItemRequest {
+  name: string;
+  description?: string | null;
+  basePrice: number;
+  category: string;
+  allergenTags?: string | null;
+}
+
+export interface PricedMenuItem {
+  id: string;
+  name: string;
+  basePrice: number;
+  currentPrice: number;
+  pricingTier: string;
+}
+
+// ---------- SuperShop ----------
+
+export interface Supplier {
+  id: string;
+  tenantId: string;
+  name: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  rating: number | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateSupplierRequest {
+  name: string;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+}
+
+export interface LoyaltyAccount {
+  id: string;
+  tenantId: string;
+  customerId: string;
+  pointsBalance: number;
+  totalPointsEarned: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductBatch {
+  id: string;
+  tenantId: string;
+  productId: string;
+  batchNumber: string;
+  quantity: number;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface CreateProductBatchRequest {
+  productId: string;
+  batchNumber: string;
+  quantity: number;
+  expiresAt: string;
+}
+
+// ---------- Clothing ----------
+
+export interface SustainabilityRating {
+  id: string;
+  tenantId: string;
+  productId: string;
+  score: number;
+  certifications: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSustainabilityRatingRequest {
+  productId: string;
+  score: number;
+  certifications?: string | null;
+}

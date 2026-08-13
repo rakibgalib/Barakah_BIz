@@ -27,6 +27,15 @@ const NAV_SECTIONS: { label: string; links: { href: string; label: string }[] }[
     label: "Activity",
     links: [{ href: "/notifications", label: "Notifications" }],
   },
+  {
+    label: "Business Extensions",
+    links: [
+      { href: "/prescriptions", label: "Prescriptions" },
+      { href: "/menu-items", label: "Menu Items" },
+      { href: "/supershop", label: "SuperShop" },
+      { href: "/sustainability", label: "Sustainability" },
+    ],
+  },
 ];
 
 function initialsFor(email: string): string {
