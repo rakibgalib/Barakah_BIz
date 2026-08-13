@@ -371,6 +371,28 @@ deliberately skipped so far since 5 of its 6 features are AI-dependent (see the 
 note above); revisit once the AI Integration phase makes those buildable, or build the thin
 Sustainability-only slice if it's wanted sooner.
 
+## Phase 3, slice 4: Clothing Extension (2026-08-12) — thin slice, code complete
+
+Deliberately minimal, as flagged when it was first skipped in favor of Restaurant: `doc.html`
+lists six Clothing Extension features and five of them (Size Recommendation, Trend Prediction,
+Color Coordination, Virtual Try-On, Outfit Suggestions) need real prediction/vision models, all
+deferred to the AI Integration phase. Sustainability is the one that's plain data, so it's the
+only thing built here — one entity, one controller, no config class (there's nothing to
+configure beyond the data itself).
+
+### Clothing Service (`src/Modules/ClothingService/`), port 5013
+- [x] `SustainabilityRating` entity — `POST /api/sustainability-ratings`,
+  `GET/PUT /api/sustainability-ratings/product/{productId}` (score 0-100 + certifications, e.g.
+  "organic,recycled,fair-trade")
+- [x] `sustainability_ratings` table added to `create_tenant_schema()`
+- [x] Same conventions as every other service; registered in `.sln`/`docker-compose.yml`
+- [x] `dotnet build` — 0 errors; `dotnet test` — 10/10 still passing, no regressions
+
+**Phase 3 is now complete**: all four business extensions exist (Pharmacy, Restaurant, SuperShop
+full slices; Clothing intentionally thin). Every AI-dependent feature across all four is deferred
+to the AI Integration phase (Month 7-8) rather than faked — a consistent line held across this
+whole phase, not just this slice.
+
 ## Open decisions carried forward
 - Subscription pricing (Basic/Professional/Enterprise/Pharmacy/Restaurant/Clothing/SuperShop) is "TBD" in `doc.html` — set when ready.
 - Citus-from-day-one vs. deferring sharding — flagged as an assumption in `doc.html`, not yet revisited.

@@ -301,6 +301,19 @@ BEGIN
     ', schema_name);
 
     EXECUTE format('
+        CREATE TABLE IF NOT EXISTS %I.sustainability_ratings (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            tenant_id UUID NOT NULL,
+            product_id UUID NOT NULL,
+            score INTEGER NOT NULL,
+            certifications VARCHAR(500),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (product_id)
+        )
+    ', schema_name);
+
+    EXECUTE format('
         CREATE TABLE IF NOT EXISTS %I.suppliers (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             tenant_id UUID NOT NULL,
